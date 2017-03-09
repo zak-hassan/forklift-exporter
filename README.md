@@ -14,10 +14,10 @@ java -jar target/s3-exportor-1.0-SNAPSHOT.jar  -input $PWD/src/main/resources/or
 - Not ready for usage still in development
 
 - required input: 
-	* -input - location of the json file that will be converted to parquet
-	* -output - location of output parquet file.
-
+	* -input 	: location of the json file that will be converted to parquet
+	* -output 	: location of output parquet file.
+	* -s3filename 	: location where the output file will get stored at.
 # Demo
 
-[![asciicast](https://asciinema.org/a/ao1irl3zbcuueddx9hyvi5f0l.png)](https://asciinema.org/a/ao1irl3zbcuueddx9hyvi5f0l)
+[![ScreenShot](https://raw.githubusercontent.com/zmhassan/kafka-s3-exporter/master/imgs/S3VimeoParquet.png)](https://vimeo.com/207705541)
 
