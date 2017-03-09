@@ -1,10 +1,15 @@
 package com.analyticsio.kafkaexporter;
 
 import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.Bucket;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,7 +21,10 @@ import org.apache.hadoop.fs.Path;
 import org.apache.parquet.avro.AvroParquetWriter;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -42,10 +50,14 @@ public class App
 
     @Parameter(names = "-input", description = "Input file location. Default json",required = true)
     String input;
-    
+
     @Parameter(names = "-output",
             description = "Output file location. Default Parquet",required = true)
     String output;
+
+
+    @Parameter(names = "-s3filename", description = "Filename to save into s3 with", required=true)
+    String s3filename;
 
 
     public static void main( String[] args ){
@@ -132,6 +144,12 @@ public class App
             System.out.println("Done Writing Parquet file: "+ output);
             writer.close();
         }
+
+        System.out.println("Now uploading to s3!");
+        AmazonS3 client= getAmazonS3Client();
+        listBuckets(client);
+        uploadFile(s3filename,"analyticsio-sandbox",output, client);
+
     }
 
 
@@ -143,6 +161,14 @@ public class App
 
     private static AmazonS3 getAmazonS3Client() {
         AWSCredentials credentials = new ProfileCredentialsProvider().getCredentials();
-        return new AmazonS3Client(credentials);
+        // Need to make this region selected via parameters rather then hard coded.
+        return AmazonS3ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion(Regions.US_EAST_2).build();
     }
+
+    private static void uploadFile(String fileName, String bucketName, String output_file , AmazonS3 client){
+         client.putObject(new PutObjectRequest(bucketName, fileName,
+                new File(output_file)));
+        System.out.println("Done uploading");
+    }
+
 }
