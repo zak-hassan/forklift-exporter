@@ -17,4 +17,7 @@ java -jar target/s3-exportor-1.0-SNAPSHOT.jar  -input $PWD/src/main/resources/or
 	* -input - location of the json file that will be converted to parquet
 	* -output - location of output parquet file.
 
+# Demo
+
+[![asciicast](https://asciinema.org/a/ao1irl3zbcuueddx9hyvi5f0l.png)](https://asciinema.org/a/ao1irl3zbcuueddx9hyvi5f0l)
 
