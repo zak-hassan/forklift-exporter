@@ -1,0 +1,37 @@
+[
+  {
+    "productName": "Car",
+    "productPrice": 11.11,
+    "productCategory": 1,
+    "productQuantity": 1,
+    "_id": "58b59ab3412d0b08536dd333"
+  },
+  {
+    "productName": "iPhone6",
+    "productPrice": 330.99,
+    "productCategory": 1,
+    "productQuantity": 1,
+    "_id": "58b59d61412d0b08536dd335"
+  },
+  {
+    "productName": "Bluetooth Speakers",
+    "productPrice": 22.99,
+    "productCategory": 3,
+    "productQuantity": 1,
+    "_id": "58b59dd8412d0b08536dd337"
+  },
+  {
+    "productName": "Blueray player",
+    "productPrice": 22.99,
+    "productCategory": 1,
+    "productQuantity": 4,
+    "_id": "58b59e0b412d0b08536dd339"
+  },
+  {
+    "productName": "Wireless Mouse",
+    "productPrice": 22.99,
+    "productCategory": 1,
+    "productQuantity": 1,
+    "_id": "58b59f65412d0b08536dd33b"
+  }
+]

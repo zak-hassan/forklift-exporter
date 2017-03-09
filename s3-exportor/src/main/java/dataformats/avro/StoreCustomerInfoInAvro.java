@@ -14,8 +14,7 @@ import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.DatumWriter;
 import org.apache.avro.specific.SpecificDatumReader;
 
-import dataformats.generated.GeneratedCustomerBean;
-import dataformats.utils.AvroUtils;
+ import dataformats.utils.AvroUtils;
 
 /**
  * Demonstrating storage of avro schema using genericRecord class with avro schema.
@@ -62,6 +61,7 @@ public class StoreCustomerInfoInAvro {
     return cust;
   }
 
+  /*
   public void deserialize() throws IOException {
     DataFileReader<GeneratedCustomerBean> dataFR =
         AvroUtils.createDataFileReader(CUSTOMER_AVRO, GeneratedCustomerBean.class);
@@ -72,11 +72,11 @@ public class StoreCustomerInfoInAvro {
     }
     dataFR.close();
   }
-
+*/
   public static void main(String[] args) throws IOException {
     StoreCustomerInfoInAvro poc = new StoreCustomerInfoInAvro();
     poc.serialize();
-    poc.deserialize();
+    //poc.deserialize();
   }
 
 }

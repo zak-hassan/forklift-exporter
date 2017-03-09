@@ -15,12 +15,20 @@
       <artifactId>avro</artifactId>
       <version>1.8.1</version>
     </dependency>
+    <!-- Parquet Avro Integration-->
+    <dependency>
+      <groupId>org.apache.parquet</groupId>
+      <artifactId>parquet-avro</artifactId>
+      <version>1.9.0</version>
+    </dependency>
+
     <!-- Jackson Avro For Schema Generation -->
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-avro</artifactId>
       <version>${jackson.version}</version>
     </dependency>
+
 
     <!-- Jackson Protocol Buffer Tooling -->
     <dependency>

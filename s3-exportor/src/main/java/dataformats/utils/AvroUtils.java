@@ -13,7 +13,6 @@ import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.DatumWriter;
 import org.apache.avro.specific.SpecificDatumReader;
 
-import dataformats.generated.GeneratedCustomerBean;
 
 public class AvroUtils<T> {
 
