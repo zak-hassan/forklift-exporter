@@ -1,63 +1,43 @@
 package com.analyticsio.kafkaexporter;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.Bucket;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData;
-import org.apache.avro.generic.GenericRecord;
-import org.apache.hadoop.fs.Path;
-import org.apache.parquet.avro.AvroParquetWriter;
-import org.apache.parquet.hadoop.metadata.CompressionCodecName;
+import java.util.HashMap;
+import java.util.Map;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-
-import dataformats.utils.SchemaUtils;
-import model.Order;
+import pipeline.DataPipeline;
+import pipeline.FileSinkPipeline;
+import pipeline.FileSourcePipeline;
+import pipeline.S3SinkPipeline;
+import pipeline.S3SourcePipeline;
+import pipeline.SinkPipeline;
+import pipeline.SourcePipeline;
 
 /**
  * Entrypoint for cli for setting up and configuring input
+ *
+ * forklift -source file://$PWD/src/main/resources/orders.json?dataformat=json
+ * -sink s3://bucket/foldername/file?region=us-east-2&dataformat=parquet
+ * -avroSchema file://$PWD/orderSchema.json
  *
  */
 public class App 
 {
 
+    public static final String S3_SUFFIX = "s3://";
+    public static final String FILE_SUFFIX = "file://";
+    public static final String  DEFAULT_INPUT="json";
+    public static final String  DEFAULT_OUTPUT= "json";
 
-    @Parameter(names = "-kafkaUrl", description = "Url to KafkaBroker")
-    String kafkaUrl= "localhost:9092";
+    @Parameter(names = "-source", description = "Source of the data being imported")
+    String source="file:///Users/zhassan/git/kafka-s3-exporter/s3-exportor/src/main/resources/orders.json?dataformat=json";
 
-    @Parameter(names = "-topic", description = "Topic in Kafka to read from")
-    String topic= "topicA";
+    @Parameter(names = "-sink", description = "Target location to export data to")
+    String sink="s3://analyticsio-sandbox/demo1/example2.parquet?region=us-east-2&dataformat=parquet";
 
-
-    @Parameter(names = "-input", description = "Input file location. Default json",required = true)
-    String input;
-
-    @Parameter(names = "-output",
-            description = "Output file location. Default Parquet",required = true)
-    String output;
-
-
-    @Parameter(names = "-s3filename", description = "Filename to save into s3 with", required=true)
-    String s3filename;
+    @Parameter(names = "-avroSchema", description = "Source of the data being imported")
+    String avroSchema="file://$PWD/orderSchema.json";
 
 
     public static void main( String[] args ){
@@ -68,107 +48,116 @@ public class App
 
 
     public void run(JCommander commander){
-        //AmazonS3 s3client = getAmazonS3Client();
-        //listBuckets(s3client);
-        extractJson();
+//        extractJson();
 
-        System.out.println( "Done!" );
+
+        prepareSinkAndSource();
+        System.out.println( "run (): Done!" );
 
     }
 
-    private void extractJson() {
-
-        // Read in Json from file and convert to List<Order> orders
+    /**
+     * Prepare sink and source and run data pipeline
+     */
+    private void prepareSinkAndSource() {
         try {
-            byte[] jsonData = Files.readAllBytes(Paths.get(input));
-            ObjectMapper mapper = new ObjectMapper();
-           // Order order= mapper.readValue(jsonData, Order.class);
-            List<Order> myOrders = mapper.readValue(jsonData, mapper.getTypeFactory().constructCollectionType(List.class, Order.class));
-
-            // get avro schema
-            Schema schema= SchemaUtils.toAvroSchema(Order.class);
-
-            List<GenericRecord> list= new ArrayList<>();
-            for (Order order:myOrders  ) {
-                GenericRecord item =createOrderRecord(order,schema);
-                System.out.println("order: "+order);
-                list.add(item);
-            }
-
-            writeParquetFile(list,schema, true);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            SourcePipeline sourcePipe = getSourcePipeline();
+            SinkPipeline sinkPipe = getSinkPipeline();
+            DataPipeline pipeline= new DataPipeline(sourcePipe,sinkPipe);
+            pipeline.execute();
+        }catch(Exception ex){
+            System.err.println(ex.getMessage());
+        }finally{
+            System.out.println("prepareSinkAndSource() Done!");
         }
-
     }
 
-    /**
-     * Generic Record required before writing to parquet format.
-     *
-     * @param order
-     * @param schema
-     * @return
-     */
-    private GenericRecord createOrderRecord(Order order,Schema schema) {
-        GenericRecord record = new GenericData.Record(schema);
-        record.put("_id", order.getId());
-        record.put("productName",order.getProductName());
-        record.put("productPrice",order.getProductPrice());
-        record.put("productCategory",order.getProductCategory());
-        record.put("productQuantity",order.getProductQuantity());
-        return record;
+    private String getFullPath(String originalSource, String fileSuffix) throws Exception {
+        String[] fileLocation= originalSource.split(fileSuffix);
+        if(fileLocation.length !=2 ) {
+            throw new Exception("Error: Need to provide "+fileSuffix+" + Absolute path to file");
+        }
+        return fileLocation[1];
     }
 
-    /**
-     * Writes parquet to a file in local directory then uploads file to s3 destination
-     * @param genericRecords
-     * @param schema
-     * @throws IOException
-     */
-    private void writeParquetFile(List<GenericRecord> genericRecords, Schema schema, Boolean overwrite) throws IOException {
-         CompressionCodecName comp = CompressionCodecName.SNAPPY;
-        int bSize = 256 * 1024 * 1024;
-        int pSize = 64 * 1024;
-        if(Files.exists(Paths.get(output)) && overwrite.booleanValue() == true){
-            System.out.println("Overwriting file: "+ output);
-            Files.delete(Paths.get(output));
-
+    private Map<String,String> getProperties(String fileSuffix, String s) {
+        Map<String, String> prop= new HashMap<String,String>();
+        if(s.indexOf("?") > -1){
+            String[] fileProps= s.split(("[?]"));
+//            System.out.println("fileProps: "+fileProps[1]);
+           if(fileSuffix.contentEquals(fileSuffix)) {
+               String[] properties= fileProps[1].split("&");
+               System.out.println(" Properties.length: "+properties.length+ " filename: "+s+ "filesuffix "+fileSuffix);
+               for (String p: properties) {
+                   System.out.println(" PROPERTIES: " + p);
+                   String[] property = p.split("=");
+                   prop.put(property[0],property[1]);
+               }
+           }
         }
-        try (AvroParquetWriter<GenericRecord> writer =  new AvroParquetWriter<GenericRecord>(new Path("file://" + output), schema, comp, bSize, pSize)) {
-            for (GenericRecord record : genericRecords) {
-                writer.write(record);
-            }
-            System.out.println("Done Writing Parquet file: "+ output);
-            writer.close();
-        }
-
-        System.out.println("Now uploading to s3!");
-        AmazonS3 client= getAmazonS3Client();
-        listBuckets(client);
-        uploadFile(s3filename,"analyticsio-sandbox",output, client);
-
+        return prop;
     }
 
 
-    private static void listBuckets(AmazonS3 s3client) {
-        for (Bucket bucket : s3client.listBuckets()) {
-            System.out.println(" - " + bucket.getName());
-        }
-     }
 
-    private static AmazonS3 getAmazonS3Client() {
-        AWSCredentials credentials = new ProfileCredentialsProvider().getCredentials();
-        // Need to make this region selected via parameters rather then hard coded.
-        return AmazonS3ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion(Regions.US_EAST_2).build();
+    private SourcePipeline getSourcePipeline() throws Exception {
+        SourcePipeline sourcePipe=null;
+        if(source.startsWith(FILE_SUFFIX)){
+            String file = getFullPath(source, FILE_SUFFIX);
+            Map<String,String> prop= getProperties(FILE_SUFFIX, file);
+            System.out.println("Properties: "+ prop);
+            String fileName= stripQueryString(file);
+            sourcePipe= new FileSourcePipeline(fileName, prop);
+//            System.out.println("fileLocation: "+ file);
+            System.out.println("SourcePipe: "+ sourcePipe);
+
+        } else if(source.startsWith(S3_SUFFIX)){
+            String file = getFullPath(source, S3_SUFFIX);
+            Map<String,String> prop= getProperties(S3_SUFFIX, file);
+            String fileName= stripQueryString(file);
+
+            sourcePipe= new S3SourcePipeline(fileName,  prop);
+//            System.out.println("S3 fileLocation: "+ file);
+            System.out.println(prop);
+            System.out.println("SourcePipe: "+ sourcePipe);
+
+        }else {
+            System.out.println("Unknown component");
+            throw new Exception("Error: Source Unknown component used. Please use file:// or s3:// ");
+            //TODO: Throw exception if an unsupported component is used.
+        }
+        return sourcePipe;
     }
 
-    private static void uploadFile(String fileName, String bucketName, String output_file , AmazonS3 client){
-         client.putObject(new PutObjectRequest(bucketName, fileName,
-                new File(output_file)));
-        System.out.println("Done uploading");
+    private String stripQueryString(String file){
+        String[] fileName= file.split("[?]");
+        if(fileName.length==2)
+                return fileName[0];
+        return file;
+    }
+    private SinkPipeline getSinkPipeline() throws Exception {
+        SinkPipeline sinkPipe=null;
+        if(sink.startsWith(FILE_SUFFIX)){
+            String file = getFullPath(sink,FILE_SUFFIX);
+            Map<String,String> prop= getProperties(FILE_SUFFIX, file);
+
+            String fileName= stripQueryString(file);
+            sinkPipe= new FileSinkPipeline(fileName, prop);
+            System.out.println("SinkPipe: "+ sinkPipe);
+        } else if(sink.startsWith(S3_SUFFIX)){
+            String file = getFullPath(sink,S3_SUFFIX);
+            Map<String,String> prop= getProperties(S3_SUFFIX, file);
+            System.out.println(prop);
+            String fileName= stripQueryString(file);
+            sinkPipe= new S3SinkPipeline(fileName,  prop);
+            System.out.println("SinkPipe: "+ sinkPipe);
+        }else {
+            System.out.println("Sink: Unknown component");
+            throw new Exception("Error: Sink Unknown component used. Please use file:// or s3:// ");
+
+            //TODO: Throw exception if an unsupported component is used.
+        }
+        return sinkPipe;
     }
 
 }
