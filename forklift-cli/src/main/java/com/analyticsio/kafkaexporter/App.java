@@ -30,14 +30,14 @@ public class App
     public static final String  DEFAULT_INPUT="json";
     public static final String  DEFAULT_OUTPUT= "json";
 
-    @Parameter(names = "-source", description = "Source of the data being imported")
-    String source="file:///Users/zhassan/git/kafka-s3-exporter/s3-exportor/src/main/resources/orders.json?dataformat=json";
+    @Parameter(names = "-source", description = "Source of the data being imported",required = true)
+    String source;//="file:///Users/zhassan/git/kafka-s3-exporter/s3-exportor/src/main/resources/orders.json?dataformat=json";
 
-    @Parameter(names = "-sink", description = "Target location to export data to")
-    String sink="s3://analyticsio-sandbox/demo1/example2.parquet?region=us-east-2&dataformat=parquet";
+    @Parameter(names = "-sink", description = "Target location to export data to", required = true)
+    String sink;//="s3://analyticsio-sandbox/demo1/example2.parquet?region=us-east-2&dataformat=parquet";
 
     @Parameter(names = "-avroSchema", description = "Source of the data being imported")
-    String avroSchema="file://$PWD/orderSchema.json";
+    String avroSchema;//="file://$PWD/orderSchema.json";
 
 
     public static void main( String[] args ){
@@ -53,6 +53,7 @@ public class App
 
         prepareSinkAndSource();
         System.out.println( "run (): Done!" );
+        System.exit(0);
 
     }
 

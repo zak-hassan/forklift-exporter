@@ -122,7 +122,6 @@ public class Converter {
         }
         System.out.println("Now uploading to s3!");
         AmazonS3 client= getAmazonS3Client(region);
-        listBuckets(client);
         uploadFile(s3filename, bucketName, output, client);
     }
 
