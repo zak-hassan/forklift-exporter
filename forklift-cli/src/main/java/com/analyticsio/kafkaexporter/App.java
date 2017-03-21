@@ -2,10 +2,12 @@ package com.analyticsio.kafkaexporter;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import pipeline.CassandraSinkPipeline;
 import pipeline.DataPipeline;
 import pipeline.FileSinkPipeline;
 import pipeline.FileSourcePipeline;
@@ -29,12 +31,14 @@ public class App
     public static final String FILE_SUFFIX = "file://";
     public static final String  DEFAULT_INPUT="json";
     public static final String  DEFAULT_OUTPUT= "json";
+    public static final String CASSANDRA_PREFIX = "cassandra://";
 
-    @Parameter(names = "-source", description = "Source of the data being imported",required = true)
-    String source;//="file:///Users/zhassan/git/kafka-s3-exporter/s3-exportor/src/main/resources/orders.json?dataformat=json";
+    @Parameter(names = "-source", description = "Source of the data being imported", required = true)
+    String source; //="file:///Users/zhassan/git/kafka-s3-exporter/forklift-cli/src/main/resources/orders.json?dataformat=json";
 
-    @Parameter(names = "-sink", description = "Target location to export data to", required = true)
-    String sink;//="s3://analyticsio-sandbox/demo1/example2.parquet?region=us-east-2&dataformat=parquet";
+    @Parameter(names = "-sink", description = "Target location to export data to" ,required = true)
+    String sink ; //="cassandra://192.168.33.40:9042?keyspace=product&table=customerOrder";
+    //String sink;//="s3://analyticsio-sandbox/demo1/example2.parquet?region=us-east-2&dataformat=parquet";
 
     @Parameter(names = "-avroSchema", description = "Source of the data being imported")
     String avroSchema;//="file://$PWD/orderSchema.json";
@@ -42,6 +46,15 @@ public class App
 
     public static void main( String[] args ){
         App main = new App();
+//        try {
+//            CassandraSinkPipeline sinkTest= new CassandraSinkPipeline(null, null);
+//            sinkTest.execute(null);
+//        } catch (JsonMappingException e) {
+//            e.printStackTrace();
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
+
         JCommander commander = new JCommander(main, args);
         main.run(commander);
     }
@@ -145,13 +158,20 @@ public class App
             String fileName= stripQueryString(file);
             sinkPipe= new FileSinkPipeline(fileName, prop);
             System.out.println("SinkPipe: "+ sinkPipe);
-        } else if(sink.startsWith(S3_SUFFIX)){
-            String file = getFullPath(sink,S3_SUFFIX);
-            Map<String,String> prop= getProperties(S3_SUFFIX, file);
+        } else if(sink.startsWith(S3_SUFFIX)) {
+            String file = getFullPath(sink, S3_SUFFIX);
+            Map<String, String> prop = getProperties(S3_SUFFIX, file);
             System.out.println(prop);
-            String fileName= stripQueryString(file);
-            sinkPipe= new S3SinkPipeline(fileName,  prop);
-            System.out.println("SinkPipe: "+ sinkPipe);
+            String fileName = stripQueryString(file);
+            sinkPipe = new S3SinkPipeline(fileName, prop);
+            System.out.println("SinkPipe: " + sinkPipe);
+        } else if(sink.startsWith(CASSANDRA_PREFIX)){
+            String file = getFullPath(sink, CASSANDRA_PREFIX);
+            String serverUrl= getCassandraServerUrl(file);
+            int serverPort= getCassandraPort(file);
+            sinkPipe= new CassandraSinkPipeline(serverUrl,serverPort,null);
+            System.out.println("SinkPipe: " + sinkPipe);
+
         }else {
             System.out.println("Sink: Unknown component");
             throw new Exception("Error: Sink Unknown component used. Please use file:// or s3:// ");
@@ -159,6 +179,14 @@ public class App
             //TODO: Throw exception if an unsupported component is used.
         }
         return sinkPipe;
+    }
+
+    private int getCassandraPort(String file) {
+        return 9042;
+    }
+
+    private String getCassandraServerUrl(String file) {
+        return "192.168.33.40";
     }
 
 }

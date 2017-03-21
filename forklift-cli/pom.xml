@@ -84,6 +84,12 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+    <!-- Cassandra Support -->
+    <dependency>
+      <groupId>com.datastax.cassandra</groupId>
+      <artifactId>cassandra-driver-core</artifactId>
+      <version>3.0.1</version>
+    </dependency>
   </dependencies>
 
   <build>
