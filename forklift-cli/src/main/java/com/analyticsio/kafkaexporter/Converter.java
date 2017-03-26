@@ -26,11 +26,14 @@ import java.util.List;
 
 import dataformats.utils.SchemaUtils;
 import model.Order;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by zhassan on 2017-03-17.
  */
 public class Converter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Converter.class);
 
     public static void convert(String input, String output, String s3filename, String bucketname) {
         // Read in Json from file and convert to List<Order> orders
@@ -109,7 +112,7 @@ public class Converter {
         int bSize = 256 * 1024 * 1024;
         int pSize = 64 * 1024;
         if(Files.exists(Paths.get(output)) && overwrite.booleanValue() == true){
-            System.out.println("Overwriting file: "+ output);
+            LOGGER.info("Overwriting file: "+ output);
             Files.delete(Paths.get(output));
 
         }
@@ -117,10 +120,10 @@ public class Converter {
             for (GenericRecord record : genericRecords) {
                 writer.write(record);
             }
-            System.out.println("Done Writing Parquet file: "+ output);
+            LOGGER.info("Done Writing Parquet file: "+ output);
             writer.close();
         }
-        System.out.println("Now uploading to s3!");
+        LOGGER.info("Now uploading to s3!");
         AmazonS3 client= getAmazonS3Client(region);
         uploadFile(s3filename, bucketName, output, client);
     }
@@ -128,7 +131,7 @@ public class Converter {
 
     public static void listBuckets(AmazonS3 s3client) {
         for (Bucket bucket : s3client.listBuckets()) {
-            System.out.println(" - " + bucket.getName());
+            LOGGER.info(" - " + bucket.getName());
         }
     }
 
@@ -146,7 +149,7 @@ public class Converter {
     public static void uploadFile(String fileName, String bucketName, String output_file , AmazonS3 client){
         client.putObject(new PutObjectRequest(bucketName, fileName,
                 new File(output_file)));
-        System.out.println("Done uploading");
+        LOGGER.info("Done uploading");
     }
 
 }

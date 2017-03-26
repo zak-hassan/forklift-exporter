@@ -21,6 +21,11 @@ public class S3SourcePipeline implements SourcePipeline {
     }
 
     @Override
+    public String getSource() {
+        return this.source;
+    }
+
+    @Override
     public List<Order> getData() {
 
         return null;

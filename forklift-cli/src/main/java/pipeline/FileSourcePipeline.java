@@ -19,7 +19,19 @@ public class FileSourcePipeline implements SourcePipeline {
     Map<String,String> properties;
 
 
-    public FileSourcePipeline(String source,  Map<String,String> properties) {
+    public String getSource() {
+        return source;
+    }
+
+    public String getInputFormat() {
+        return inputFormat;
+    }
+
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
+    public FileSourcePipeline(String source, Map<String,String> properties) {
         this.source=source;
         this.inputFormat=properties.getOrDefault("dataformat", DEFAULT_DATAFORMAT);
         this.properties= properties;

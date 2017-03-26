@@ -8,5 +8,6 @@ import model.Order;
  * Created by zhassan on 2017-03-16.
  */
 public interface SourcePipeline {
+    String getSource();;
     List<Order> getData();
 }

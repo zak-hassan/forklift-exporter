@@ -8,17 +8,23 @@ Components Planned To Be Included:
 
 - local filesystem
 - s3
-- http
 - hdfs
+- http
 - activemq
 - kafka
 - ftp
-- twitter
 - elasticsearch
 - mongodb
 - gluster
 - cassandra
 - ceph
+- mongo
+- postgres
+- hive
+- mysql
+- influx
+- apache ignite
+
 
 # Usage
 

@@ -8,6 +8,10 @@
   <name>forklift</name>
   <properties>
     <jackson.version>2.8.0</jackson.version>
+    <parquet.format.version>2.3.1</parquet.format.version>
+    <hadoop.version>2.7.3</hadoop.version>
+    <slf4j.version>1.7.22</slf4j.version>
+
   </properties>
   <dependencies>
     <dependency>
@@ -15,6 +19,31 @@
       <artifactId>avro</artifactId>
       <version>1.8.1</version>
     </dependency>
+
+    <!-- Logging -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+
+<!-- Parquet processing support -->
+
+    <dependency>
+      <groupId>org.apache.parquet</groupId>
+      <artifactId>parquet-format</artifactId>
+      <version>${parquet.format.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.parquet</groupId>
+      <artifactId>parquet-hadoop</artifactId>
+      <version>1.9.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-client</artifactId>
+      <version>${hadoop.version}</version>
+     </dependency>
     <!-- Parquet Avro Integration-->
     <dependency>
       <groupId>org.apache.parquet</groupId>
