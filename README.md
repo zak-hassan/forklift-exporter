@@ -34,7 +34,14 @@ cd forklift-cli
 
 mvn clean install
 
+# S3 Sink Example
 java -jar target/forklift-1.0-SNAPSHOT.jar -source file://$PWD/src/main/resources/orders.json?dataformat=json -sink s3://analyticsio-sandbox/demo1/halloffame.parquet?region=us-east-2&dataformat=parquet
+
+# HDFS Sink Example
+java -jar target/forklift-1.0-SNAPSHOT.jar -source file:///home/zhassan/Downloads/rocknroll.parquet?dataformat=parquet -sink hdfs://localhost:9000/test5/
+
+# Cassandra Sink Example
+java -jar target/forklift-1.0-SNAPSHOT.jar -source file://$PWD/src/main/resources/orders.json?dataformat=json -sink cassandra://localhost:9042?keyspace=product&table=customerOrder
 
 ```
 
