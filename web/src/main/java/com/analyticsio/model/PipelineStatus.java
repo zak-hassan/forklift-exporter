@@ -6,20 +6,10 @@ package com.analyticsio.model;
 public class PipelineStatus {
 
 
-    public PipelineStatus(Pipeline pipeline, String msg) {
-        this.pipeline = pipeline;
-        this.msg = msg;
+    public PipelineStatus( String msg) {
+         this.msg = msg;
     }
 
-    public Pipeline getPipeline() {
-        return pipeline;
-    }
-
-    public void setPipeline(Pipeline pipeline) {
-        this.pipeline = pipeline;
-    }
-
-    Pipeline pipeline;
     String msg;
 
     public String getMsg() {

@@ -23,13 +23,13 @@ public class PipelineService {
     public PipelineStatus savePipeline(Pipeline pipeline){
         LOGGER.info("save Pipeline: " + pipeline);
         //TODO: Implement persistance here
-        return new PipelineStatus(pipeline,"saved");
+        return new PipelineStatus(  "saved");
     }
 
     public PipelineStatus deletePipeline(String pipeId){
         //TODO: Implement persistance here
         LOGGER.info("pipeId: " + pipeId );
-        return new PipelineStatus(new Pipeline("file:///home/zhassan/Downloads/rocknroll.parquet?dataformat=parquet", "hdfs://localhost:9000/test5/"),"deleted");
+        return new PipelineStatus( "deleted");
     }
 
     public Pipeline getOnePipeline(String pipeId){

@@ -5,28 +5,30 @@ package com.analyticsio.model;
  */
 public class Pipeline {
 
-
+    int id;
     String source;
     String sink;
+    STATUSCONSTANT status;
 
-    @java.lang.Override
-    public java.lang.String toString() {
+    @Override
+    public String toString() {
         return "Pipeline{" +
                 "source='" + source + '\'' +
                 ", sink='" + sink + '\'' +
+                ", status=" + status +
                 '}';
     }
 
-    public Pipeline(){
-
-    };
-
+    public Pipeline(){ }
 
     public Pipeline(String source, String sink) {
         this.source = source;
         this.sink = sink;
     }
 
+    public void startPipeline(){
+        this.status = STATUSCONSTANT.INPROGRESS;
+    }
     public String getSource() {
         return source;
     }
@@ -42,4 +44,21 @@ public class Pipeline {
     public void setSink(String sink) {
         this.sink = sink;
     }
+
+    public STATUSCONSTANT getStatus() {
+        return status;
+    }
+
+    public void setStatus(STATUSCONSTANT status) {
+        this.status = status;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
 }
