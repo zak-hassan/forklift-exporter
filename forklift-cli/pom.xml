@@ -5,7 +5,8 @@
   <artifactId>forklift</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>forklift</name>
+  <name>Analytics :: Forklift :: Forklift-CLI </name>
+
   <properties>
     <jackson.version>2.8.0</jackson.version>
     <parquet.format.version>2.3.1</parquet.format.version>
