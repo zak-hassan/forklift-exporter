@@ -16,32 +16,29 @@
     <link href="https://cdn.jsdelivr.net/pnotify/3.0.0/pnotify.css" media="all" rel="stylesheet" type="text/css" /> </head>
 
 <body>
+    <div class="row">
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="navbar-brand"> <i class="fa fa-desktop" aria-hidden="true"></i> Forklift Exporter
+                <!--<img src="imgs/logo.png" alt="image of logo" style="width:204px;height:48px;">--></div>
+            <ul class="nav navbar-nav pull-right" id="main-navigation">
+                <li> <a href="#" class="pull-right"><i class="fa fa-user" aria-hidden="true"></i>
+                        Admin</a></li>
+                <li>
+                    <a href="/#/settings" class="pull-right"> <i class="fa fa-cog" aria-hidden="true"></i> Settings</a>
+                </li>
+                <li> <a href="#" class="pull-right"><i class="fa fa-sign-out" aria-hidden="true"></i> Sign out </a> </li>
+            </ul>
+        </nav>
+    </div>
     <section class='container'>
-        <hgroup>
-            <h1>Forklift </h1> </hgroup>
+        <!--
+       <section class='col-xs-12 col-sm-6 col-md-6'>
+    <section> </section>
+</section>
+-->
         <div class="row">
-            <section class='col-xs-12 col-sm-6 col-md-6'>
-                <section>
-                    <div id="formField">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Add Data Pipeline
-        </h3> </div>
-                            <div class="panel-body">
-                                <div id="foodOrder">
-                                    <div class="form-group">
-                                        <label for="source">Source</label>
-                                        <input type="text" class="form-control" id="source" name="source" placeholder="  ">
-                                        <label for="sink">Source</label>
-                                        <input type="text" class="form-control" id="sink" name="sink" placeholder="  "> </div>
-                                    <button onclick="submitForm();" class="btn btn-primary btn-info"><span class="glyphicon glyphicon-plus"></span> Create</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </section>
-            <section class="col-xs-12 col-sm-6 col-md-6">
+            <section>
+                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal"> Add Pipeline </button>
                 <h2>Pipelines</h2>
                 <table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%">
                     <thead>
@@ -74,12 +71,31 @@
                 </table>
             </section>
         </div>
-        <footer>
-            <div class="logo">
-                <a href="https://www.openshift.com/"></a>
-            </div>
-        </footer>
     </section>
+    <!-- Model Start -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Add Pipeline</h4> </div>
+                <div class="modal-body">
+                    <div id="foodOrder">
+                        <div class="form-group">
+                            <label for="source">Source</label>
+                            <input type="text" class="form-control" id="source" name="source" placeholder="  ">
+                            <label for="sink">Source</label>
+                            <input type="text" class="form-control" id="sink" name="sink" placeholder="  "> </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button onclick="submitForm();" class="btn btn-primary btn-info"><span class="glyphicon glyphicon-plus"></span> Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Model End -->
 </body>
 <script>
     (function () {
