@@ -1,11 +1,30 @@
 package com.analyticsio.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import org.mongojack.ObjectId;
+
 /**
  * Created by zhassan on 2017-04-04.
  */
 public class Pipeline {
 
-    int id;
+    private static final long serialVersionUID = 2105061907470199595L;
+    @JsonProperty("_id")
+    private String id;
+
+    @ObjectId
+    @JsonProperty("_id")
+    public String getId() {
+        return id;
+    }
+
+    @ObjectId
+    @JsonProperty("_id")
+    public void setId(String id) {
+        this.id = id;
+    }
+
     String source;
     String sink;
     STATUSCONSTANT status;
@@ -19,16 +38,18 @@ public class Pipeline {
                 '}';
     }
 
-    public Pipeline(){ }
+    public Pipeline() {
+    }
 
     public Pipeline(String source, String sink) {
         this.source = source;
         this.sink = sink;
     }
 
-    public void startPipeline(){
+    public void startPipeline() {
         this.status = STATUSCONSTANT.INPROGRESS;
     }
+
     public String getSource() {
         return source;
     }
@@ -53,12 +74,5 @@ public class Pipeline {
         this.status = status;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
 }

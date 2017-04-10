@@ -2,7 +2,12 @@ package com.analyticsio.service;
 
 import com.analyticsio.model.Pipeline;
 import com.analyticsio.model.PipelineStatus;
+import com.analyticsio.repository.MongoDBService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.DBCollection;
 
+import org.mongojack.JacksonDBCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,12 +22,19 @@ public class PipelineService {
 
     public List<Pipeline> getAll() {
         LOGGER.info("getAll Pipeline");
-        return Arrays.asList(new Pipeline("file:///home/zhassan/Downloads/rocknroll.parquet?dataformat=parquet", "hdfs://localhost:9000/test5/"));
+
+        DBCollection c = MongoDBService.connectFromEnv();
+        JacksonDBCollection<Pipeline, String> col = JacksonDBCollection.wrap(c, Pipeline.class,
+                String.class);
+        List<Pipeline> orderList = col.find().toArray(10);
+        return orderList;
     }
 
-    public PipelineStatus savePipeline(Pipeline pipeline){
-        LOGGER.info("save Pipeline: " + pipeline);
+    public PipelineStatus savePipeline(Pipeline p){
+        LOGGER.info("save Pipeline: " + p);
         //TODO: Implement persistance here
+        DBCollection c = MongoDBService.connectFromEnv();
+        JacksonDBCollection<Pipeline, String> coll = MongoDBService.persist(c, p);
         return new PipelineStatus(  "saved");
     }
 
