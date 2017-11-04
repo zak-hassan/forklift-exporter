@@ -6,39 +6,22 @@
 package forklift_test;
 //import java.util.List;
 import java.util.ArrayList;
+import static java.util.Collections.list;
+import java.util.List;
 //import java.util.List;
 
 /**
  *
  * @author ykassim
  */
-public class flift {
+public interface flift {
     
-    
-    private String Country = "Somalia";
-    private int Age = 32;
-    private ArrayList mylist = new ArrayList<>();
+    public List serialize(String file);    
       
-    
-    //mylist = new ArrayList();
-   
-    public ArrayList getlist(){
-        mylist.add(Age);
-        mylist.add(Country);
-        mylist.add("Zak");
-        //System.out.println(mylist);
-        return mylist;
-        
-    }
-            
-            
-            
             
     
     
-    //private List<String> mylist;
-    
-    
+       
     
            
     

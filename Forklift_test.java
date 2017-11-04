@@ -8,9 +8,14 @@ package forklift_test;
 import com.google.gson.Gson;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
-
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.avro.Schema; //import module
+import org.apache.avro.generic.GenericRecord; //import module
 
 
 
@@ -20,29 +25,67 @@ import org.apache.commons.net.ftp.FTPClient;
   * @author ykassim
  */
 public class Forklift_test {
+    
+    
+    public class FTPsink implements flift {
+        
+        public List serialize(String file) {
+            
+            try {
+                Scanner s = new Scanner(new File(file));
+                ArrayList<String> orders = new ArrayList<String>();
+                while (s.hasNext()){
+                    orders.add(s.next());
+                }
+                s.close();
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(Forklift_test.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+                     
+            
+            Schema schema = SchemaUtils.toAvroSchema(Order.class);
+            List<GenericRecord> list = Converter.getGenericRecords(orders, schema);
+            return list;
+            
+            
+        }
+        
+        
+      
+            
+        
+    }
+    
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public void main(String[] args) throws FileNotFoundException {
         
-        flift test = testobject();
-        Gson gson = new Gson();
-        String json = gson.toJson(test);
-        //System.out.println(json);
-        //System.out.println(args[0]);
         
-       try (FileWriter filew = new FileWriter("/home/ykassim/json_test")){
+       flift example = new FTPsink();
+       List my_obj = example.serialize("/home/ykassim/json_test");    
+       
+       
+       PrintWriter pw = new PrintWriter(new File("/home/ykassim/json-1"));
+       int i = 0;
+       pw.print(my_obj.get(i));
+       
+       /*
+       try (FileWriter filew = new FileWriter("/home/ykassim/json-1")){
            
-           gson.toJson(test,filew);
+           //gson.toJson(test,filew);
        } catch (IOException e){
            e.printStackTrace();
        }
        
-       String server =  args[0];//"ftp.dlptest.com";
+       */
+       
+       String server = "ftp.dlptest.com";
        int port = 21;
-       String user = args[1];//"dlpuser@dlptest.com";
-       String pass = args[2];//"fwRhzAnR1vgig8s";
+       String user = "dlpuser@dlptest.com";
+       String pass = "fwRhzAnR1vgig8s";
        
        FTPClient ftpClient = new FTPClient();
               
@@ -54,7 +97,7 @@ public class Forklift_test {
            
            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
            
-           File localfile = new File("/home/ykassim/json_test");
+           File localfile = new File("/home/ykassim/json-1");
            
            String remotefile = "upload2";
            InputStream inputstream = new FileInputStream(localfile);
@@ -97,17 +140,7 @@ public class Forklift_test {
         
         
     }
-        
-    private static flift testobject(){
-        
-            
-            flift test = new flift();
-            test.getlist();
-            
-            return test;
-    }
-        
-        // TODO code application logic here
     
+     
 }
 

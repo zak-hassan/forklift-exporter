@@ -2,16 +2,16 @@ package pipeline;
 
 import com.analyticsio.kafkaexporter.Converter;
 
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.Schema; //this is used to serialize items in json format
+import org.apache.avro.generic.GenericRecord; //
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.Map; //maps key items to values
 
-import dataformats.utils.SchemaUtils;
+import dataformats.utils.SchemaUtils; 
 import model.Order;
 
 /**
